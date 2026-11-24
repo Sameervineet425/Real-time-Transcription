@@ -1,13 +1,26 @@
 
 services:
   - type: web
-    name: audio-transcription-system
-    env: python
+    name: real-time-transcription
+    runtime: python
     plan: free
-    buildCommand: ""
-    startCommand: "python manage.py migrate && gunicorn audioapp.wsgi"
+
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate
+
+    startCommand: gunicorn audioproject.wsgi:application
+
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.4
+
+      - key: SECRET_KEY
+        generateValue: true
+
       - key: DEBUG
         value: "False"
+
       - key: API_KEY_ASSEMBLYAI
         sync: false
